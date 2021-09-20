@@ -1,7 +1,7 @@
-cd ./<file name>
+cd ./file name
 
 
 npm install 
 
 
-kkb init <project name>
+kkb init project name
