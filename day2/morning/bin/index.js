@@ -19,10 +19,13 @@ await execa('npm install', {
     cwd: getRootPath(),
     stdio: [2,2,2]
 })
-// await spawn('node', {cmd: `./${customInput.packageName}/index.js`})
 open(`http://localhost:${ customInput.port }`)
+await execa('npm test', {
+     cwd: path.resolve(process.cwd(),customInput.packageName)
+ })
+
+
 
 function getRootPath(){
-    // console.log(process.cwd());
     return path.resolve(process.cwd(),customInput.packageName)
 }
