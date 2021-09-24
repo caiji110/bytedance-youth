@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id = 'app'>{{ title }}</div>
+    <script>
+        const Vue = {
+            createApp (options) {
+                return {
+                    mount (selectorID) {
+                        const container = document.querySelector(selectorID) 
+                        // console.log(this);
+                        if(options.data) this.data = options.data()
+                        //console.log(this);
+                        if(options.setup) this.setupState = options.setup()
+                        const myProxy = new Proxy(this, {
+                            // setup的优先级最高
+                            get (target, key) {
+                                if(target.setupState && key in target.setupState ){
+                                    return target.setupState[key]
+                                } else {
+                                    return target.data[key]
+                                }
+                            },
+                            set (target, key, value) {
+                                if(target.setupState && key in target.setupState ){
+                                    target.setupState[key] = value
+                                } else {
+                                    target.data[key] = value
+                                }
+                            }
+                        })
+                        options.render = this.complie(container, myProxy)    
+                    },
+                    complie (container, myProxy) {
+                        let innerHtml = container.innerHTML;
+                        const matchRule = /\{\{\s*(\S{1,})\s*\}\}/
+                        const attrsName = innerHtml.match(matchRule)[1]
+                        container.innerHTML = myProxy[attrsName]
+                    }
+                }
+            }
+        }
+    </script>
+    <script>
+        const app = Vue.createApp( {
+            data () {
+                return {
+                    title: 'hello,Vue3!'
+                }
+            },
+            setup () {
+                return {
+                    title: 'Vue3!'
+                }
+            }
+
+        } )
+        app.mount('#app')
+    </script>
+</body>
+</html>
